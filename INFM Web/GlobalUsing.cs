@@ -3,7 +3,6 @@ global using System.ComponentModel.DataAnnotations.Schema;
 global using INFM_Web.Models;
 global using INFM_Web.Models.DTOs;
 global using INFM_Web.Data;
-global using INFM_Web.Repo;
 global using INFM_Web.Constants;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.AspNetCore.Identity;

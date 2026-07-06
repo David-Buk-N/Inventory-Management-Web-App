@@ -1,6 +1,9 @@
-﻿using INFM_Web.Models;
+using INFM_Web.Data;
+using INFM_Web.Models;
 using INFM_Web.Models.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 
 namespace INFM_Web.Controllers
@@ -8,11 +11,12 @@ namespace INFM_Web.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly IHomeRepository _homeRepository;
-        public HomeController(ILogger<HomeController> logger, IHomeRepository homeRepository)
+        private readonly ApplicationDbContext _context;
+
+        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context)
         {
-            _homeRepository = homeRepository;
             _logger = logger;
+            _context = context;
         }
 
         public IActionResult Index()
@@ -24,27 +28,28 @@ namespace INFM_Web.Controllers
         {
             return View();
         }
+
         public IActionResult About()
         {
             return View();
         }
-        public async Task<IActionResult> Shop(string sterm="", int categoryId=0)
+
+        // Back-office inventory dashboard.
+        [Authorize(Roles = "Admin,Worker")]
+        public async Task<IActionResult> Dash()
         {
-            IEnumerable<Product> products = await _homeRepository.DisplayProducts(sterm, categoryId);
-            IEnumerable<Category> categories = await _homeRepository.Categories();
-            ProductDisplayModel productModel = new ProductDisplayModel
+            var model = new DashboardViewModel
             {
-                products = products,
-                categories = categories,
-                STerm = sterm,
-                CategoryId = categoryId
+                ProductCount = await _context.Products.CountAsync(),
+                SupplierCount = await _context.Suppliers.CountAsync(),
+                WarehouseCount = await _context.Warehouses.CountAsync(),
+                TotalUnitsOnHand = await _context.Stocks.SumAsync(s => (int?)s.Quantity) ?? 0,
+                LowStockCount = await _context.Products
+                    .Where(p => (p.Stocks.Sum(s => (int?)s.Quantity) ?? 0) <= p.ReorderLevel)
+                    .CountAsync()
             };
 
-            return View(productModel);
-        }
-        public IActionResult Dash()
-        {
-            return View();
+            return View(model);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

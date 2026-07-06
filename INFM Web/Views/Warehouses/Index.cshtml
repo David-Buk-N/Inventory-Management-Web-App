@@ -1,0 +1,54 @@
+@model IEnumerable<INFM_Web.Models.Warehouse>
+
+@{
+    ViewData["Title"] = "Warehouses";
+}
+
+<div class="d-flex justify-content-between align-items-center mt-3">
+    <h1>Warehouses</h1>
+    <a asp-action="Create" class="btn btn-primary">+ New Warehouse</a>
+</div>
+<hr />
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No warehouses yet. Create one to start tracking stock.</div>
+}
+else
+{
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Code</th>
+                <th>@Html.DisplayNameFor(model => model.WarehouseName)</th>
+                <th>@Html.DisplayNameFor(model => model.City)</th>
+                <th>@Html.DisplayNameFor(model => model.Capacity)</th>
+                <th class="text-end">Units On Hand</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td><span class="badge text-bg-secondary">@item.Code</span></td>
+                    <td>@item.WarehouseName</td>
+                    <td>@item.City</td>
+                    <td>@item.Capacity</td>
+                    <td class="text-end">
+                        @item.UnitsOnHand
+                        @if (item.Capacity > 0 && item.UnitsOnHand > item.Capacity)
+                        {
+                            <span class="badge text-bg-danger">Over capacity</span>
+                        }
+                    </td>
+                    <td class="text-end">
+                        <a asp-action="Details" asp-route-id="@item.Warehouse_Id">Details</a> |
+                        <a asp-action="Edit" asp-route-id="@item.Warehouse_Id">Edit</a> |
+                        <a asp-action="Delete" asp-route-id="@item.Warehouse_Id" class="text-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

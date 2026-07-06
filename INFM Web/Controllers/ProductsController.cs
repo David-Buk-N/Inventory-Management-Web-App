@@ -1,15 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using INFM_Web.Constants;
+using INFM_Web.Data;
+using INFM_Web.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using INFM_Web.Data;
-using INFM_Web.Models;
 
 namespace INFM_Web.Controllers
 {
+    // Everyone in the back-office can browse the catalogue; only admins may change it.
+    [Authorize(Roles = "Admin,Worker")]
     public class ProductsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -22,20 +23,27 @@ namespace INFM_Web.Controllers
         // GET: Products
         public async Task<IActionResult> Index()
         {
-              return _context.Products != null ? 
-                          View(await _context.Products.ToListAsync()) :
-                          Problem("Entity set 'ApplicationDbContext.Products'  is null.");
+            var products = await _context.Products
+                .Include(p => p.Category)
+                .Include(p => p.Supplier)
+                .Include(p => p.Stocks)
+                .ToListAsync();
+            return View(products);
         }
 
         // GET: Products/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Products == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
             var product = await _context.Products
+                .Include(p => p.Category)
+                .Include(p => p.Supplier)
+                .Include(p => p.Stocks)!
+                    .ThenInclude(s => s.Warehouse)
                 .FirstOrDefaultAsync(m => m.Product_Id == id);
             if (product == null)
             {
@@ -46,17 +54,18 @@ namespace INFM_Web.Controllers
         }
 
         // GET: Products/Create
-        public IActionResult Create()
+        [Authorize(Roles = nameof(Roles.Admin))]
+        public async Task<IActionResult> Create()
         {
+            await PopulateSelectLists();
             return View();
         }
 
         // POST: Products/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Product_Id,Product_Name,Product_Price,ProductDescription,ProductCount,Order_Id,Category_Id,Supplier_Id")] Product product)
+        [Authorize(Roles = nameof(Roles.Admin))]
+        public async Task<IActionResult> Create([Bind("Product_Name,SKU,Product_Price,ProductDescription,ReorderLevel,Category_Id,Supplier_Id")] Product product)
         {
             if (ModelState.IsValid)
             {
@@ -64,13 +73,15 @@ namespace INFM_Web.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            await PopulateSelectLists(product);
             return View(product);
         }
 
         // GET: Products/Edit/5
+        [Authorize(Roles = nameof(Roles.Admin))]
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Products == null)
+            if (id == null)
             {
                 return NotFound();
             }
@@ -80,15 +91,15 @@ namespace INFM_Web.Controllers
             {
                 return NotFound();
             }
+            await PopulateSelectLists(product);
             return View(product);
         }
 
         // POST: Products/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Product_Id,Product_Name,Product_Price,ProductDescription,ProductCount,Order_Id,Category_Id,Supplier_Id")] Product product)
+        [Authorize(Roles = nameof(Roles.Admin))]
+        public async Task<IActionResult> Edit(int id, [Bind("Product_Id,Product_Name,SKU,Product_Price,ProductDescription,ReorderLevel,Category_Id,Supplier_Id")] Product product)
         {
             if (id != product.Product_Id)
             {
@@ -115,18 +126,22 @@ namespace INFM_Web.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            await PopulateSelectLists(product);
             return View(product);
         }
 
         // GET: Products/Delete/5
+        [Authorize(Roles = nameof(Roles.Admin))]
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Products == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
             var product = await _context.Products
+                .Include(p => p.Category)
+                .Include(p => p.Supplier)
                 .FirstOrDefaultAsync(m => m.Product_Id == id);
             if (product == null)
             {
@@ -139,25 +154,32 @@ namespace INFM_Web.Controllers
         // POST: Products/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = nameof(Roles.Admin))]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Products == null)
-            {
-                return Problem("Entity set 'ApplicationDbContext.Products'  is null.");
-            }
             var product = await _context.Products.FindAsync(id);
             if (product != null)
             {
                 _context.Products.Remove(product);
+                await _context.SaveChangesAsync();
             }
-            
-            await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
 
         private bool ProductExists(int id)
         {
-          return (_context.Products?.Any(e => e.Product_Id == id)).GetValueOrDefault();
+            return _context.Products.Any(e => e.Product_Id == id);
+        }
+
+        private async Task PopulateSelectLists(Product? product = null)
+        {
+            ViewBag.Categories = new SelectList(
+                await _context.Categories.OrderBy(c => c.CategoryName).ToListAsync(),
+                "Category_Id", "CategoryName", product?.Category_Id);
+            ViewBag.Suppliers = new SelectList(
+                await _context.Suppliers.OrderBy(s => s.SupplierName).ToListAsync(),
+                "Supplier_Id", "SupplierName", product?.Supplier_Id);
         }
     }
 }

@@ -1,62 +1,63 @@
-﻿@model INFM_Web.Models.Product
+@model INFM_Web.Models.Product
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Product";
+    var categories = ViewBag.Categories as SelectList;
+    var suppliers = ViewBag.Suppliers as SelectList;
 }
 
-<h1>Edit</h1>
-
-<h4>Product</h4>
+<h1>Edit Product</h1>
 <hr />
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-5">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Product_Id" />
-            <div class="form-group">
+            <div class="form-group mb-2">
                 <label asp-for="Product_Name" class="control-label"></label>
                 <input asp-for="Product_Name" class="form-control" />
                 <span asp-validation-for="Product_Name" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group mb-2">
+                <label asp-for="SKU" class="control-label"></label>
+                <input asp-for="SKU" class="form-control" />
+                <span asp-validation-for="SKU" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-2">
                 <label asp-for="Product_Price" class="control-label"></label>
                 <input asp-for="Product_Price" class="form-control" />
                 <span asp-validation-for="Product_Price" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group mb-2">
                 <label asp-for="ProductDescription" class="control-label"></label>
                 <input asp-for="ProductDescription" class="form-control" />
                 <span asp-validation-for="ProductDescription" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="ProductCount" class="control-label"></label>
-                <input asp-for="ProductCount" class="form-control" />
-                <span asp-validation-for="ProductCount" class="text-danger"></span>
+            <div class="form-group mb-2">
+                <label asp-for="ReorderLevel" class="control-label"></label>
+                <input asp-for="ReorderLevel" class="form-control" />
+                <span asp-validation-for="ReorderLevel" class="text-danger"></span>
             </div>
-            @* <div class="form-group">
-                <label asp-for="Order_Id" class="control-label"></label>
-                <input asp-for="Order_Id" class="form-control" />
-                <span asp-validation-for="Order_Id" class="text-danger"></span>
-            </div> *@
-            <div class="form-group">
+            <div class="form-group mb-2">
                 <label asp-for="Category_Id" class="control-label"></label>
-                <input asp-for="Category_Id" class="form-control" />
+                <select asp-for="Category_Id" class="form-select" asp-items="categories">
+                    <option value="">-- Select category --</option>
+                </select>
                 <span asp-validation-for="Category_Id" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group mb-3">
                 <label asp-for="Supplier_Id" class="control-label"></label>
-                <input asp-for="Supplier_Id" class="form-control" />
+                <select asp-for="Supplier_Id" class="form-select" asp-items="suppliers">
+                    <option value="">-- Select supplier --</option>
+                </select>
                 <span asp-validation-for="Supplier_Id" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {

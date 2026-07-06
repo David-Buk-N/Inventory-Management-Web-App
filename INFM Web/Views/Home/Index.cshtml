@@ -1,115 +1,52 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewData["Title"] = "Home";
+    var isStaff = User.IsInRole("Admin") || User.IsInRole("Worker");
 }
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventory Management System</title>
-    <style>
-        /* Reset some default styles for consistency */
-        body, h1, h2, h3, p, ul, li {
-            margin: 0;
-            padding: 0;
+<div class="p-5 mb-4 bg-body-tertiary rounded-3 text-center">
+    <h1 class="display-5 fw-bold">Inventory Management System</h1>
+    <p class="col-lg-8 mx-auto fs-5 text-muted">
+        Track products, suppliers and stock across every warehouse from one place.
+    </p>
+    <div class="d-inline-flex gap-2 mt-2">
+        @if (isStaff)
+        {
+            <a asp-controller="Home" asp-action="Dash" class="btn btn-primary btn-lg">Go to Dashboard</a>
         }
-
-        /* Apply basic styling to the page */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+        else if (User.Identity != null && User.Identity.IsAuthenticated)
+        {
+            <a asp-area="Identity" asp-page="/Account/Manage/Index" class="btn btn-primary btn-lg">My Profile</a>
         }
-
-        header {
-            background-color: green;
-            color: #fff;
-            padding: 20px;
-            text-align: center;
+        else
+        {
+            <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-primary btn-lg">Login</a>
         }
+    </div>
+</div>
 
-            header h1 {
-                font-size: 36px;
-                text-transform: uppercase;
-            }
-
-        main {
-            padding: 20px;
-        }
-
-        /* Feature Section */
-        .features {
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-            margin-top: 20px;
-        }
-
-        .feature {
-            background-color: #fff;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            margin: 20px;
-            text-align: center;
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-        }
-
-            .feature:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-            }
-
-            .feature h2 {
-                font-size: 24px;
-                margin-bottom: 10px;
-            }
-
-            .feature p {
-                font-size: 16px;
-                color: #555;
-            }
-
-        footer {
-            text-align: center;
-            padding: 10px 0;
-            background-color: green;
-            color: #fff;
-        }
-
-        /* Customize your dashboard styles here */
-    </style>
-</head>
-<body>
-    <header>
-        <h1>Welcome to Inventory Management</h1>
-    </header>
-
-    <main>
-        <section class="features">
-            <div class="feature">
-                <h2>Product Management</h2>
-                <p>Efficiently manage your product inventory with ease.</p>
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h2 class="h5">Product Management</h2>
+                <p class="text-muted mb-0">Maintain your catalogue with SKUs, pricing and reorder levels.</p>
             </div>
-            <div class="feature">
-                <h2>Supplier Tracking</h2>
-                <p>Keep track of your suppliers and their contact information.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h2 class="h5">Warehouse Stock</h2>
+                <p class="text-muted mb-0">See how much of each product sits in every warehouse.</p>
             </div>
-            <div class="feature">
-                <h2>Order Management</h2>
-                <p>Streamline your order process and monitor order status.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h2 class="h5">Supplier Tracking</h2>
+                <p class="text-muted mb-0">Keep supplier details and contacts close to the products they supply.</p>
             </div>
-            <div class="feature">
-                <a href="/Home/Shop">
-                <h2>Explore Our Store</h2>
-                <p>Streamline your order process and monitor order status.</p>
-                </a>
-            </div>
-        </section>
-    </main>
-
-    <footer>
-        <p>&copy; 2023 Inventory Management System</p>
-    </footer>
-</body>
-</html>
+        </div>
+    </div>
+</div>

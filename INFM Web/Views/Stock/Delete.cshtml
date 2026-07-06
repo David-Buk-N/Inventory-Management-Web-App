@@ -1,0 +1,24 @@
+@model INFM_Web.Models.Stock
+
+@{
+    ViewData["Title"] = "Delete Stock Record";
+}
+
+<h1 class="text-danger">Delete Stock Record</h1>
+<h4>Remove this product from this warehouse?</h4>
+<hr />
+
+<dl class="row">
+    <dt class="col-sm-3">Product</dt>
+    <dd class="col-sm-9">@Model.Product?.Product_Name</dd>
+    <dt class="col-sm-3">Warehouse</dt>
+    <dd class="col-sm-9">@Model.Warehouse?.WarehouseName (@Model.Warehouse?.Code)</dd>
+    <dt class="col-sm-3">Quantity</dt>
+    <dd class="col-sm-9">@Model.Quantity</dd>
+</dl>
+
+<form asp-action="Delete">
+    <input type="hidden" asp-for="Stock_Id" />
+    <input type="submit" value="Delete" class="btn btn-danger" />
+    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+</form>
