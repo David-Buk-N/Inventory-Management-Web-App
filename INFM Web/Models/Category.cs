@@ -8,8 +8,8 @@ namespace INFM_Web.Models
         public int Category_Id { get; set; }
         [Required]
         [MaxLength(40)]
-        public string CategoryName { get; set; }
+        public required string CategoryName { get; set; }
 
-        public List <Product> Products { get; set; }
+        public required List<Product> Products { get; set; }
     }
 }

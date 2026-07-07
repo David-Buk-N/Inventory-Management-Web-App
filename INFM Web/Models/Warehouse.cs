@@ -8,19 +8,19 @@ namespace INFM_Web.Models
 
         [Required]
         [Display(Name = "Warehouse Name")]
-        public string WarehouseName { get; set; }
+        public required string WarehouseName { get; set; }
 
         [Required]
         [Display(Name = "Warehouse Code")]
         [MaxLength(20)]
-        public string Code { get; set; }
+        public required string Code { get; set; }
 
         [Required]
         [Display(Name = "Location / Address")]
-        public string Location { get; set; }
+        public required string Location { get; set; }
 
         [Required]
-        public string City { get; set; }
+        public required string City { get; set; }
 
         [Display(Name = "Storage Capacity")]
         public int Capacity { get; set; }

@@ -12,7 +12,8 @@
         public int OrderStatusId { get; set; }
         [Required]
         public bool IsDeleted { get; set; }
-        public OrderStatus OrderStatus { get; set; }
-        public List<OrderDetail> Details { get; set; }
+        [Required]
+        public required OrderStatus OrderStatus { get; set; }
+        public required List<OrderDetail> Details { get; set; }
     }
 }

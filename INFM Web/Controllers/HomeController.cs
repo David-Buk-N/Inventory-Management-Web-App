@@ -36,6 +36,7 @@ namespace INFM_Web.Controllers
 
         // Back-office inventory dashboard.
         [Authorize(Roles = "Admin,Worker")]
+#pragma warning disable CS8604
         public async Task<IActionResult> Dash()
         {
             var model = new DashboardViewModel
@@ -51,6 +52,7 @@ namespace INFM_Web.Controllers
 
             return View(model);
         }
+#pragma warning restore CS8604
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
